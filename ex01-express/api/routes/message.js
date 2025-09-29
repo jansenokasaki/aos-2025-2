@@ -3,34 +3,70 @@ import { Router } from "express";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  return res.send(Object.values(req.context.models.messages));
+router.get("/", async (req, res) => {
+  try {
+    const listaMensagens = await req.context.models.Message.findAll();
+    return res.send(listaMensagens);
+  } catch (erro) {
+    return res.status(500).json({ erro: erro.message });
+  }
 });
 
-router.get("/:messageId", (req, res) => {
-  return res.send(req.context.models.messages[req.params.messageId]);
+router.get("/:messageId", async (req, res) => {
+  try {
+    const mensagemEncontrada = await req.context.models.Message.findByPk(req.params.messageId);
+    if (!mensagemEncontrada) {
+      return res.status(404).json({ erro: "Mensagem não encontrada" });
+    }
+    return res.send(mensagemEncontrada);
+  } catch (erro) {
+    return res.status(500).json({ erro: erro.message });
+  }
 });
 
-router.post("/", (req, res) => {
-  const id = uuidv4();
-  const message = {
-    id,
-    text: req.body.text,
-    userId: req.context.me.id,
-  };
+router.post("/", async (req, res) => {
+  try {
+    console.log("req.body:", req.body);
+    console.log("req.context.me:", req.context.me);
+    if (!req.context.me) {
+      return res.status(401).json({ erro: "Usuário não autenticado" });
+    }
+    if (!req.body.text) {
+      return res.status(400).json({ erro: "Texto da mensagem é obrigatório" });
+    }
 
-  req.context.models.messages[id] = message;
+    // Use o ID do usuário autenticado ao invés do userId do body
+    const idUsuario = req.context.me.id;
+    console.log("idUsuario type:", typeof idUsuario, "value:", idUsuario);
+    
+    const dadosMensagem = {
+      id: uuidv4(),
+      text: req.body.text,
+      userId: idUsuario,
+    };
+    console.log("dadosMensagem:", dadosMensagem);
 
-  return res.send(message);
+    const novaMensagem = await req.context.models.Message.create(dadosMensagem);
+
+    return res.send(novaMensagem);
+  } catch (erro) {
+    console.error("Erro:", erro);
+    return res.status(500).json({ erro: erro.message });
+  }
 });
 
-router.delete("/:messageId", (req, res) => {
-  const { [req.params.messageId]: message, ...otherMessages } =
-    req.context.models.messages;
+router.delete("/:messageId", async (req, res) => {
+  try {
+    const mensagemParaExcluir = await req.context.models.Message.findByPk(req.params.messageId);
+    if (!mensagemParaExcluir) {
+      return res.status(404).json({ erro: "Mensagem não encontrada" });
+    }
 
-  req.context.models.messages = otherMessages;
-
-  return res.send(message);
+    await mensagemParaExcluir.destroy();
+    return res.status(204).send();
+  } catch (erro) {
+    return res.status(500).json({ erro: erro.message });
+  }
 });
 
 export default router;
