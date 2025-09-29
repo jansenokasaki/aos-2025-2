@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { Router } from "express";
 
 const router = Router();
@@ -39,7 +38,6 @@ router.post("/", async (req, res) => {
     console.log("idUsuario type:", typeof idUsuario, "value:", idUsuario);
     
     const dadosMensagem = {
-      id: uuidv4(),
       text: req.body.text,
       userId: idUsuario,
     };
