@@ -57,7 +57,7 @@ router.put("/:messageId", async (req, res) => {
     const { messageId } = req.params;
     const { text } = req.body;
 
-    const getMessage = await messagesModel.findByPk(messageId);
+    const getMessage = await req.context.models.Message.findByPk(messageId);
     if(!getMessage){
       return res.status(404).send({
         error : "Mensagem não encontrada"
