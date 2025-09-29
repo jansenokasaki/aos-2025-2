@@ -52,6 +52,32 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.put("/:messageId", async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { text } = req.body;
+
+    const getMessage = await messagesModel.findByPk(messageId);
+    if(!getMessage){
+      return res.status(404).send({
+        error : "Mensagem não encontrada"
+      })}
+
+    await messagesModel.update({text}, {where: {
+      id : messageId
+    }})
+
+    return res.status(200).send({
+      message : "A mensagem foi atualizada"
+    })
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      error : "Erro interno do servidor."
+    }); 
+  }
+})
+
 router.delete("/:messageId", async (req, res) => {
   try {
     const mensagemParaExcluir = await req.context.models.Message.findByPk(req.params.messageId);
