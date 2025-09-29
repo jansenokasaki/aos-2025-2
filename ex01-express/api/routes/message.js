@@ -57,26 +57,31 @@ router.put("/:messageId", async (req, res) => {
     const { messageId } = req.params;
     const { text } = req.body;
 
+    if (!text || typeof text !== "string" || text.trim() === "") {
+      return res.status(400).json({ erro: "O campo 'text' é obrigatório e deve ser uma string não vazia" });
+    }
+
+    if (!req.context.me) {
+      return res.status(401).json({ erro: "Usuário não autenticado" });
+    }
+
     const mensagemEncontrada = await req.context.models.Message.findByPk(messageId);
-    if(!getMessage){
-      return res.status(404).send({
-        error : "Mensagem não encontrada"
-      })}
+    if (!mensagemEncontrada) {
+      return res.status(404).json({ erro: "Mensagem não encontrada" });
+    }
 
-    await mensagemEncontrada.update({text}, {where: {
-      id : messageId
-    }})
+    if (mensagemEncontrada.userId !== req.context.me.id) {
+      return res.status(403).json({ erro: "Você não tem permissão para editar esta mensagem" });
+    }
 
-    return res.status(200).send({
-      message : "A mensagem foi atualizada"
-    })
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      error : "Erro interno do servidor."
-    }); 
+    await mensagemEncontrada.update({ text });
+
+    return res.status(200).json({ mensagem: mensagemEncontrada });
+  } catch (erro) {
+    console.error("Erro ao atualizar mensagem:", erro);
+    return res.status(500).json({ erro: "Erro interno do servidor" });
   }
-})
+});
 
 router.delete("/:messageId", async (req, res) => {
   try {
