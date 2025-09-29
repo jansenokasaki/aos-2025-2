@@ -35,7 +35,6 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ erro: "Texto da mensagem é obrigatório" });
     }
 
-    // Use o ID do usuário autenticado ao invés do userId do body
     const idUsuario = req.context.me.id;
     console.log("idUsuario type:", typeof idUsuario, "value:", idUsuario);
     
