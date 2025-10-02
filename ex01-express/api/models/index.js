@@ -2,6 +2,7 @@ import Sequelize from "sequelize";
 
 import getUserModel from "./user";
 import getMessageModel from "./message";
+import getTaskModel from "./task";
 
 //POSTGRES_URL
 const sequelize = new Sequelize(process.env.POSTGRES_URL, {
@@ -21,6 +22,7 @@ const sequelize = new Sequelize(process.env.POSTGRES_URL, {
 const models = {
   User: getUserModel(sequelize, Sequelize),
   Message: getMessageModel(sequelize, Sequelize),
+  Task: getTaskModel(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((key) => {
