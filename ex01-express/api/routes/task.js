@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
     
     const taskData = {
       id: uuidv4(),
-      descricao: req.body.descrocao,
+      descricao: req.body.descricao,
     };
 
     const task = await req.context.models.Task.create(taskData);
