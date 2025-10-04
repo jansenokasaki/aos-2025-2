@@ -8,12 +8,10 @@ const getTaskModel = (sequelize, { DataTypes }) => {
 
     descricao: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
 
      concluida: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
     },
   });
 
