@@ -30,7 +30,6 @@ router.post("/", async (req, res) => {
   
 
     // Use o ID do usuário autenticado ao invés do userId do body
-    console.log("userId type:", typeof userId, "value:", userId);
     
     const taskData = {
       id: uuidv4(),
