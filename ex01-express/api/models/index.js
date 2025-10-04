@@ -19,6 +19,7 @@ const sequelize = new Sequelize(process.env.POSTGRES_URL, {
   dialectModule: require("pg"),
 });
 
+
 const models = {
   User: getUserModel(sequelize, Sequelize),
   Message: getMessageModel(sequelize, Sequelize),
